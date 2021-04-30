@@ -111,4 +111,4 @@ async def disconnect(ctx):
     else:
         voices = await chan.connect()
 token = os.environ.get('token')
-bot.run(token)
+bot.run(str(token))
