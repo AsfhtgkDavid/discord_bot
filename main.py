@@ -4,7 +4,7 @@ from discord.ext import commands, tasks
 from discord.utils import get
 import os
 
-async def mute(channel, member:discord.Member, time_min:int, reason:str):
+async def mutes(channel, member:discord.Member, time_min:int, reason:str):
     conn = MySQLdb.connect('sql4.freemysqlhosting.net', 'sql4409115', 'UamctGqrPZ', 'sql4409115')
     role = member.guild.get_role(610742364797141002)
     emb = discord.Embed(description=f'Я выдал тебе мут {member.mention} за **"{reason}"**')
@@ -25,7 +25,7 @@ async def warn(user:discord.Member, channel):
         cursor.execute(f'INSERT INTO warns(user, count) VALUES ({user.id},{1})')
     elif db[0][0] == 3:
         cursor.execute(f'UPDATE warns SET count = 0 WHERE user = {user.id}')
-        await mute(channel, user, 4, "Получил 3 варна!")
+        await mutes(channel, user, 4, "Получил 3 варна!")
     else:
         cursor.execute(f'UPDATE warns SET count = count + 1 WHERE user = {user.id}')
     conn.close()
@@ -93,22 +93,18 @@ async def say(ctx):
 async def dell(ctx):
     await ctx.channel.purge()
 @bot.command()
-async def connect(ctx):
-    global voices
-    chan = ctx.message.author.voice.channel
-    voices = get(bot.voice_clients, guild = ctx.guild)
-    if voices and voices.is_connected():
-        await voices.move_to(chan)
+async def mute(ctx, member:discord.Member, time:int, what, *, reason):
+    if what in ['m', 'min', 'minutes']:
+        mutes(ctx, member, time, reason)
+    elif what in ['h', 'hours']:
+        time = time * 60
+        mutes(ctx, member, time, reason)
+    elif what in ['d', 'days']:
+        time = time * 60 * 24
+        mutes(ctx, member, time, reason)
     else:
-        voices = await chan.connect()
-@bot.command()
-async def disconnect(ctx):
-    global voices
-    chan = ctx.message.author.voice.channel
-    voices = get(bot.voice_clients, guild = ctx.guild)
-    if voices and voices.is_connected():
-        await voices.disconnect()
-    else:
-        voices = await chan.connect()
+        ctx.send("Часовая эдиница не найдена")
+
+# bot.run(open('token.txt'))
 token = os.environ.get('token')
-bot.run(str(token))
+bot.run(token)
