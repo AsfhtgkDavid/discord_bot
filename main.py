@@ -12,6 +12,7 @@ async def mutes(channel, member:discord.Member, time_min:int, reason:str):
     cursor = conn.cursor()
     await member.add_roles(role, reason=reason)
     cursor.execute(f'INSERT INTO mutes VALUES({member.id},{time_min})')
+    await channel.purge(limit=1)
     await channel.send(embed= emb)
 
 
@@ -33,6 +34,8 @@ async def warn(user:discord.Member, channel):
 
 
 bot = commands.Bot(command_prefix='-', intents=discord.Intents.all())
+@bot.event()
+async
 @bot.event
 async def on_message(ctx):
 
@@ -95,16 +98,19 @@ async def dell(ctx):
 @bot.command()
 async def mute(ctx, member:discord.Member, time:int, what, *, reason):
     if what in ['m', 'min', 'minutes']:
-        mutes(ctx, member, time, reason)
+        await mutes(ctx, member, time, reason)
+        await ctx.channel.purge(limit=1)
     elif what in ['h', 'hours']:
         time = time * 60
-        mutes(ctx, member, time, reason)
+        await mutes(ctx, member, time, reason)
+        await ctx.channel.purge(limit=1)
     elif what in ['d', 'days']:
         time = time * 60 * 24
-        mutes(ctx, member, time, reason)
+        await mutes(ctx, member, time, reason)
+        await ctx.channel.purge(limit=1)
     else:
-        ctx.send("Часовая эдиница не найдена")
+        await ctx.send("Часовая эдиница не найдена")
 
-# bot.run(open('token.txt'))
+# bot.run(open('token.txt').readline())
 token = os.environ.get('token')
 bot.run(token)
