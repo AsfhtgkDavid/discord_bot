@@ -34,8 +34,6 @@ async def warn(user:discord.Member, channel):
 
 
 bot = commands.Bot(command_prefix='-', intents=discord.Intents.all())
-@bot.event()
-async
 @bot.event
 async def on_message(ctx):
 
